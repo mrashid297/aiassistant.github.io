@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Pro Assistant - Advanced AI Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #49c1af;
+            --secondary-color: #7c3aed;
+            --accent-color: #0891b2;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --error-color: #dc2626;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --border-color: #cbd5e1;
+            --border-light: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-color: #475569;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Iframe detection and responsive adjustments */
+        body.iframe-mode {
+            height: 100% !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Force iframe to use full available space */
+        html.iframe-mode {
+            height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            min-height: 100vh;
+        }
+
+        /* Iframe-specific container adjustments */
+        body.iframe-mode .container {
+            min-height: 100% !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            padding: 8px !important;
+            gap: 12px !important;
+            max-width: none !important;
+            margin: 0 !important;
+        }
+
+        .sidebar {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        /* Iframe-specific sidebar adjustments */
+        body.iframe-mode .sidebar {
+            padding: 16px;
+            border-radius: 12px;
+            position: static;
+            height: auto;
+            max-height: calc(100vh - 20px);
+            overflow-y: auto;
+        }
+
+        .main-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+            max-height: calc(100vh - 40px);
+            
+        }
+
+        /* Iframe-specific main-content adjustments */
+        body.iframe-mode .main-content {
+            height: calc(100vh - 16px) !important;
+            max-height: calc(100vh - 16px) !important;
+            min-height: calc(100vh - 16px) !important;
+            border-radius: 8px !important;
+            margin: 0 !important;
+        }
+
+        .header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15pxpx;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5856eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .chat-container {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 0;
+            min-height: 300px;
+        }
+
+        /* Iframe-specific chat container adjustments */
+        body.iframe-mode .chat-container {
+            padding: 12px !important;
+            min-height: 300px !important;
+            flex: 1 !important;
+            height: auto !important;
+            max-height: none !important;
+            overflow-y: auto !important;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .user .message-avatar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .assistant .message-avatar {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .message-content {
+            background: var(--bg-secondary);
+            padding: 14px 18px;
+            border-radius: 18px;
+            max-width: 60%;
+            border: 1px solid var(--border-color);
+            position: relative;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .user .message-content {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .input-container {
+            padding: 24px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary-color);
+        }
+
+        .input-field {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 16px;
+            resize: none;
+            min-height: 24px;
+            max-height: 120px;
+            font-family: inherit;
+        }
+
+        .input-field::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .action-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .send-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .send-btn:hover {
+            background: #5856eb;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .sidebar-section {
+            margin-bottom: 32px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .feature-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .feature-card {
+            padding: 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feature-card:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-1px);
+        }
+
+        .feature-card.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .feature-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .feature-card:not(.active) .feature-icon {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .feature-card.active .feature-icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .feature-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature-info p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-style: italic;
+            padding: 16px 0;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .quick-action {
+            padding: 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .quick-action:hover {
+            background: var(--bg-tertiary);
+            transform: translateY(-2px);
+        }
+
+        .quick-action-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .quick-action-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .quick-action-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload input {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .settings-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+
+        .message-action-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .message-action-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* Tablet and small desktop adjustments */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 250px 1fr;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .sidebar {
+                padding: 20px;
+            }
+
+            .main-content {
+                height: calc(100vh - 30px);
+                max-height: calc(100vh - 30px);
+            }
+
+            .message-content {
+                max-width: 75%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                padding: 10px;
+                gap: 15px;
+            }
+
+            .sidebar {
+                order: 2;
+                position: static;
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .main-content {
+                order: 1;
+                height: calc(100vh - 20px);
+                max-height: calc(100vh - 20px);
+                border-radius: 12px;
+            }
+
+            .header {
+                padding: 16px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .header-controls {
+                gap: 8px;
+            }
+
+            .btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+
+            .message-content {
+                max-width: 85%;
+                padding: 12px 16px;
+                border-radius: 16px;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .chat-container {
+                padding: 16px;
+                min-height: 250px;
+            }
+
+            .input-container {
+                padding: 16px;
+            }
+
+            .input-wrapper {
+                padding: 12px;
+            }
+
+            .feature-grid {
+                gap: 8px;
+            }
+
+            .feature-card {
+                padding: 12px;
+            }
+
+            /* Iframe-specific mobile adjustments */
+            body.iframe-mode .container {
+                padding: 5px;
+                gap: 10px;
+            }
+
+            body.iframe-mode .sidebar {
+                padding: 12px;
+                order: 2;
+            }
+
+            body.iframe-mode .main-content {
+                order: 1;
+                height: calc(100vh - 10px);
+                max-height: calc(100vh - 10px);
+            }
+
+            body.iframe-mode .chat-container {
+                padding: 12px;
+                min-height: 200px;
+            }
+
+            body.iframe-mode .header {
+                padding: 16px;
+            }
+
+            body.iframe-mode .input-container {
+                padding: 12px;
+            }
+        }
+
+        /* Mobile portrait and comprehensive small screen support */
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px;
+                gap: 12px;
+            }
+
+            .sidebar {
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .main-content {
+                height: calc(100vh - 16px);
+                max-height: calc(100vh - 16px);
+                border-radius: 8px;
+            }
+
+            .header {
+                padding: 12px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .header-controls {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+                flex: 1;
+                min-width: 70px;
+            }
+
+            .message-content {
+                max-width: 90%;
+                padding: 10px 14px;
+                border-radius: 14px;
+                font-size: 14px;
+            }
+
+            .chat-container {
+                padding: 12px;
+                min-height: 200px;
+                gap: 12px;
+            }
+
+            .input-container {
+                padding: 12px;
+            }
+
+            .input-wrapper {
+                padding: 10px;
+                border-radius: 12px;
+            }
+
+            .input-field {
+                font-size: 14px;
+            }
+
+            .feature-card {
+                padding: 10px;
+                border-radius: 8px;
+            }
+
+            .feature-info h3 {
+                font-size: 13px;
+            }
+
+            .feature-info p {
+                font-size: 11px;
+            }
+
+            /* Iframe-specific mobile portrait adjustments */
+            body.iframe-mode .container {
+                padding: 5px;
+                gap: 8px;
+            }
+
+            body.iframe-mode .sidebar {
+                display: none; /* Hide sidebar in very small iframes */
+            }
+
+            body.iframe-mode .main-content {
+                height: calc(100vh - 10px);
+                max-height: calc(100vh - 10px);
+                border-radius: 6px;
+            }
+
+            body.iframe-mode .header {
+                padding: 8px;
+                flex-direction: row;
+                align-items: center;
+            }
+
+            body.iframe-mode .header-controls {
+                gap: 4px;
+            }
+
+            body.iframe-mode .btn {
+                padding: 4px 8px;
+                font-size: 11px;
+                min-width: 50px;
+            }
+
+            body.iframe-mode .chat-container {
+                padding: 8px;
+                min-height: 150px;
+            }
+
+            body.iframe-mode .input-container {
+                padding: 8px;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 320px) {
+            .container {
+                padding: 5px;
+                gap: 8px;
+            }
+
+            .header {
+                padding: 8px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .btn {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+
+            .message-content {
+                max-width: 95%;
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .chat-container {
+                padding: 8px;
+                min-height: 180px;
+            }
+
+            .input-wrapper {
+                padding: 8px;
+            }
+
+            body.iframe-mode .container {
+                padding: 3px;
+                gap: 5px;
+            }
+
+            body.iframe-mode .main-content {
+                height: calc(100vh - 6px);
+                max-height: calc(100vh - 6px);
+            }
+
+            body.iframe-mode .header {
+                padding: 6px;
+            }
+
+            body.iframe-mode .chat-container {
+                padding: 6px;
+                min-height: 120px;
+            }
+
+            body.iframe-mode .input-container {
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Online</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">AI Capabilities</h3>
+                <div class="feature-grid">
+                    <div class="feature-card active" data-feature="chat">
+                        <div class="feature-icon">💬</div>
+                        <div class="feature-info">
+                            <h3>Chat Assistant</h3>
+                            <p>General conversation</p>
+                        </div>
+                    </div>
+                    <div class="feature-card" data-feature="code">
+                        <div class="feature-icon">💻</div>
+                        <div class="feature-info">
+                            <h3>Code Helper</h3>
+                            <p>Programming assistance</p>
+                        </div>
+                    </div>
+                    <div class="feature-card" data-feature="writing">
+                        <div class="feature-icon">✍️</div>
+                        <div class="feature-info">
+                            <h3>Writing Assistant</h3>
+                            <p>Content creation</p>
+                        </div>
+                    </div>
+                    <div class="feature-card" data-feature="analysis">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-info">
+                            <h3>Data Analysis</h3>
+                            <p>Insights & reports</p>
+                        </div>
+                    </div>
+                    <div class="feature-card" data-feature="research">
+                        <div class="feature-icon">🔍</div>
+                        <div class="feature-info">
+                            <h3>Research</h3>
+                            <p>Information gathering</p>
+                        </div>
+                    </div>
+                    <div class="feature-card" data-feature="math">
+                        <div class="feature-icon">🧮</div>
+                        <div class="feature-info">
+                            <h3>Math Solver</h3>
+                            <p>Calculations & equations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Quick Actions</h3>
+                <div class="feature-grid">
+                    <div class="feature-card" onclick="insertPrompt('Explain this concept in simple terms:')">
+                        <div class="feature-icon">🎓</div>
+                        <div class="feature-info">
+                            <h3>Explain</h3>
+                            <p>Simplify concepts</p>
+                        </div>
+                    </div>
+                    <div class="feature-card" onclick="insertPrompt('Summarize this text:')">
+                        <div class="feature-icon">📝</div>
+                        <div class="feature-info">
+                            <h3>Summarize</h3>
+                            <p>Key points</p>
+                        </div>
+                    </div>
+                    <div class="feature-card" onclick="insertPrompt('Translate this to English:')">
+                        <div class="feature-icon">🌐</div>
+                        <div class="feature-info">
+                            <h3>Translate</h3>
+                            <p>Language conversion</p>
+                        </div>
+                    </div>
+                    <div class="feature-card" onclick="insertPrompt('Debug this code:')">
+                        <div class="feature-icon">🐛</div>
+                        <div class="feature-info">
+                            <h3>Debug</h3>
+                            <p>Fix code issues</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div class="logo">
+                    <div class="logo-icon">🤖</div>
+                    <span>Rashid ai Assistant</span>
+                </div>
+                <div class="header-controls">
+                    <button class="btn btn-secondary" onclick="clearChat()">
+                        🗑️ Clear
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportChat()">
+                        📥 Export
+                    </button>
+                    <button class="btn btn-secondary" onclick="openSettings()">
+                        ⚙️ Settings
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleTheme()">
+                        🌙 Theme
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-container" id="chatContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🚀</div>
+                    <h3>Welcome to Rashid AI Assistant</h3>
+                    <p>Your advanced AI companion for coding, writing, analysis, and more.</p>
+                </div>
+
+                <div class="quick-actions">
+                    <div class="quick-action" onclick="insertPrompt('Write a professional email about:')">
+                        <div class="quick-action-icon">📧</div>
+                        <div class="quick-action-title">Email Writer</div>
+                        <div class="quick-action-desc">Compose professional emails</div>
+                    </div>
+                    <div class="quick-action" onclick="insertPrompt('Create a Python script that:')">
+                        <div class="quick-action-icon">🐍</div>
+                        <div class="quick-action-title">Code Generator</div>
+                        <div class="quick-action-desc">Generate code snippets</div>
+                    </div>
+                    <div class="quick-action" onclick="insertPrompt('Analyze this data and provide insights:')">
+                        <div class="quick-action-icon">📈</div>
+                        <div class="quick-action-title">Data Analyst</div>
+                        <div class="quick-action-desc">Extract insights from data</div>
+                    </div>
+                    <div class="quick-action" onclick="insertPrompt('Create a detailed plan for:')">
+                        <div class="quick-action-icon">📋</div>
+                        <div class="quick-action-title">Project Planner</div>
+                        <div class="quick-action-desc">Strategic planning assistance</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <span>AI is thinking</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        class="input-field" 
+                        id="messageInput" 
+                        placeholder="Ask me anything... I can help with coding, writing, analysis, math, and more!"
+                        rows="1"
+                    ></textarea>
+                    <div class="input-actions">
+                        <div class="file-upload">
+                            <input type="file" id="fileInput" accept=".txt,.pdf,.doc,.docx,.csv,.json" multiple>
+                            <button class="action-btn" onclick="document.getElementById('fileInput').click()">
+                                📎
+                            </button>
+                        </div>
+                        <button class="action-btn" onclick="toggleVoiceInput()">
+                            🎤
+                        </button>
+                        <button class="action-btn send-btn" id="sendBtn" onclick="sendMessage()">
+                            ➤
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Settings</h2>
+                <button class="close-btn" onclick="closeSettings()">&times;</button>
+            </div>
+            
+            <div class="settings-group">
+                <label class="settings-label">AI Model</label>
+                <select class="settings-input" id="modelSelect">
+                    <option value="llama-3.1-8b-instant">LLaMA 3.1 8B (Fast)</option>
+                    <option value="llama-3.1-70b-versatile">LLaMA 3.1 70B (Powerful)</option>
+                    <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+                </select>
+            </div>
+
+            <div class="settings-group">
+                <label class="settings-label">Temperature (Creativity)</label>
+                <input type="range" class="settings-input" id="temperatureSlider" min="0" max="1" step="0.1" value="0.7">
+                <span id="temperatureValue">0.7</span>
+            </div>
+
+            <div class="settings-group">
+                <label class="settings-label">Max Tokens</label>
+                <input type="number" class="settings-input" id="maxTokens" value="1000" min="100" max="4000">
+            </div>
+
+            <div class="settings-group">
+                <label class="settings-label">System Prompt</label>
+                <textarea class="settings-input" id="systemPrompt" rows="4" placeholder="You are a helpful AI assistant..."></textarea>
+            </div>
+
+            <div class="settings-group">
+                <label class="settings-label">
+                    <span>Auto-save conversations</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autoSave" checked>
+                        <span class="slider"></span>
+                    </label>
+                </label>
+            </div>
+
+            <div class="settings-group">
+                <label class="settings-label">
+                    <span>Show typing indicators</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="showTyping" checked>
+                        <span class="slider"></span>
+                    </label>
+                </label>
+            </div>
+
+            <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            GROQ_API_KEY: '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',
+            GROQ_API_URL: 'https://api.groq.com/openai/v1/chat/completions',
+            DEFAULT_MODEL: 'llama-3.1-8b-instant',
+            DEFAULT_TEMPERATURE: 0.7,
+            DEFAULT_MAX_TOKENS: 1000
+        };
+
+        // State management
+        let conversationHistory = [];
+        let currentFeature = 'chat';
+        let isTyping = false;
+        let settings = {
+            model: CONFIG.DEFAULT_MODEL,
+            temperature: CONFIG.DEFAULT_TEMPERATURE,
+            maxTokens: CONFIG.DEFAULT_MAX_TOKENS,
+            systemPrompt: 'You are an advanced AI assistant with expertise in coding, writing, analysis, mathematics, and research. Provide helpful, accurate, and detailed responses.',
+            autoSave: true,
+            showTyping: true,
+            theme: 'light'
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Detect if running in iframe and apply iframe-mode class
+            detectIframeMode();
+            initializeApp();
+            loadSettings();
+            setupEventListeners();
+        });
+
+        function detectIframeMode() {
+            try {
+                // Check if the page is running inside an iframe
+                if (window.self !== window.top) {
+                    document.body.classList.add('iframe-mode');
+                    document.documentElement.classList.add('iframe-mode');
+                    
+                    // Additional iframe optimizations
+                    document.documentElement.style.height = '100%';
+                    document.documentElement.style.margin = '0';
+                    document.documentElement.style.padding = '0';
+                    document.body.style.height = '100%';
+                    document.body.style.margin = '0';
+                    document.body.style.padding = '0';
+                    
+                    // Prevent scrolling on the parent page
+                    document.body.style.overflow = 'hidden';
+                    
+                    // Force iframe to use available space
+                    document.body.style.minHeight = '100%';
+                    document.body.style.maxHeight = '100%';
+                }
+            } catch (e) {
+                // If we can't access window.top due to cross-origin restrictions,
+                // we're likely in an iframe (WordPress scenario)
+                document.body.classList.add('iframe-mode');
+                document.documentElement.classList.add('iframe-mode');
+                document.documentElement.style.height = '100%';
+                document.documentElement.style.margin = '0';
+                document.documentElement.style.padding = '0';
+                document.body.style.height = '100%';
+                document.body.style.margin = '0';
+                document.body.style.padding = '0';
+                document.body.style.overflow = 'hidden';
+                document.body.style.minHeight = '100%';
+                document.body.style.maxHeight = '100%';
+            }
+        }
+
+        function initializeApp() {
+            // Load saved conversations
+            loadConversations();
+            
+            // Set initial feature
+            setActiveFeature('chat');
+            
+            // Auto-resize textarea
+            const textarea = document.getElementById('messageInput');
+            textarea.addEventListener('input', autoResizeTextarea);
+        }
+
+        function setupEventListeners() {
+            // Enter key to send message
+            document.getElementById('messageInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // File upload handler
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+
+            // Feature selection
+            document.querySelectorAll('.feature-card[data-feature]').forEach(card => {
+                card.addEventListener('click', function() {
+                    setActiveFeature(this.dataset.feature);
+                });
+            });
+
+            // Settings sliders
+            document.getElementById('temperatureSlider').addEventListener('input', function() {
+                document.getElementById('temperatureValue').textContent = this.value;
+            });
+        }
+
+        function setActiveFeature(feature) {
+            currentFeature = feature;
+            
+            // Update UI
+            document.querySelectorAll('.feature-card[data-feature]').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`[data-feature="${feature}"]`).classList.add('active');
+            
+            // Update placeholder based on feature
+            const placeholders = {
+                chat: 'Ask me anything... I can help with coding, writing, analysis, math, and more!',
+                code: 'Describe the code you need or paste code for review...',
+                writing: 'What would you like me to write? (emails, articles, reports, etc.)',
+                analysis: 'Share your data or describe what you need analyzed...',
+                research: 'What topic would you like me to research?',
+                math: 'Enter your math problem or equation...'
+            };
+            
+            document.getElementById('messageInput').placeholder = placeholders[feature] || placeholders.chat;
+        }
+
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message || isTyping) return;
+
+            // Add user message
+            addMessage('user', message);
+            messageInput.value = '';
+            autoResizeTextarea.call(messageInput);
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            try {
+                // Prepare context based on current feature
+                const contextualPrompt = getContextualPrompt(message);
+                
+                // Add to conversation history
+                conversationHistory.push({
+                    role: 'user',
+                    content: contextualPrompt
+                });
+
+                // Call Groq API
+                const response = await callGroqAPI();
+                
+                // Add AI response
+                addMessage('assistant', response);
+                
+                // Add to conversation history
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: response
+                });
+
+                // Auto-save if enabled
+                if (settings.autoSave) {
+                    saveConversations();
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('assistant', '❌ Sorry, I encountered an error. Please try again.', true);
+            } finally {
+                hideTypingIndicator();
+            }
+        }
+
+        function getContextualPrompt(message) {
+            const contexts = {
+                chat: message,
+                code: `As a coding assistant, help with this request: ${message}`,
+                writing: `As a writing assistant, help create content for: ${message}`,
+                analysis: `As a data analyst, analyze and provide insights for: ${message}`,
+                research: `As a research assistant, provide comprehensive information about: ${message}`,
+                math: `As a mathematics expert, solve or explain: ${message}`
+            };
+            
+            return contexts[currentFeature] || message;
+        }
+
+        async function callGroqAPI() {
+            const response = await fetch(CONFIG.GROQ_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${CONFIG.GROQ_API_KEY}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model: settings.model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: settings.systemPrompt
+                        },
+                        ...conversationHistory.slice(-10) // Keep last 10 messages for context
+                    ],
+                    max_tokens: settings.maxTokens,
+                    temperature: settings.temperature,
+                    stream: false
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        function addMessage(sender, content, isError = false) {
+            const chatContainer = document.getElementById('chatContainer');
+            
+            // Remove empty state if present
+            const emptyState = chatContainer.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
+            // Remove quick actions if present
+            const quickActions = chatContainer.querySelector('.quick-actions');
+            if (quickActions) {
+                quickActions.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = sender === 'user' ? 'U' : '🤖';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            
+            if (isError) {
+                messageContent.style.background = 'var(--error-color)';
+                messageContent.style.color = 'white';
+            }
+            
+            // Format content (handle code blocks, etc.)
+            messageContent.innerHTML = formatMessage(content);
+            
+            const messageTime = document.createElement('div');
+            messageTime.className = 'message-time';
+            messageTime.textContent = new Date().toLocaleTimeString();
+            
+            const messageActions = document.createElement('div');
+            messageActions.className = 'message-actions';
+            messageActions.innerHTML = `
+                <button class="message-action-btn" onclick="copyMessage(this)">📋 Copy</button>
+                <button class="message-action-btn" onclick="regenerateResponse(this)">🔄 Regenerate</button>
+            `;
+            
+            messageContent.appendChild(messageTime);
+            if (sender === 'assistant') {
+                messageContent.appendChild(messageActions);
+            }
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function formatMessage(content) {
+            // Handle code blocks
+            content = content.replace(/```(\w+)?\n([\s\S]*?)```/g, function(match, lang, code) {
+                return `<div class="code-block"><pre><code>${escapeHtml(code.trim())}</code></pre></div>`;
+            });
+            
+            // Handle inline code
+            content = content.replace(/`([^`]+)`/g, '<code style="background: var(--bg-tertiary); padding: 2px 4px; border-radius: 4px;">$1</code>');
+            
+            // Handle line breaks
+            content = content.replace(/\n/g, '<br>');
+            
+            return content;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showTypingIndicator() {
+            if (!settings.showTyping) return;
+            
+            isTyping = true;
+            document.getElementById('typingIndicator').style.display = 'flex';
+            document.getElementById('sendBtn').disabled = true;
+            
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            isTyping = false;
+            document.getElementById('typingIndicator').style.display = 'none';
+            document.getElementById('sendBtn').disabled = false;
+        }
+
+        function autoResizeTextarea() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        }
+
+        function insertPrompt(prompt) {
+            const messageInput = document.getElementById('messageInput');
+            messageInput.value = prompt + ' ';
+            messageInput.focus();
+            autoResizeTextarea.call(messageInput);
+        }
+
+        function clearChat() {
+            if (confirm('Are you sure you want to clear the chat?')) {
+                document.getElementById('chatContainer').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🚀</div>
+                        <h3>Welcome to AI Pro Assistant</h3>
+                        <p>Your advanced AI companion for coding, writing, analysis, and more.</p>
+                    </div>
+                `;
+                conversationHistory = [];
+                if (settings.autoSave) {
+                    saveConversations();
+                }
+            }
+        }
+
+        function exportChat() {
+            const messages = conversationHistory.map(msg => 
+                `${msg.role.toUpperCase()}: ${msg.content}`
+            ).join('\n\n');
+            
+            const blob = new Blob([messages], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-chat-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', newTheme);
+            settings.theme = newTheme;
+            saveSettings();
+        }
+
+        function openSettings() {
+            document.getElementById('settingsModal').style.display = 'flex';
+            
+            // Load current settings
+            document.getElementById('modelSelect').value = settings.model;
+            document.getElementById('temperatureSlider').value = settings.temperature;
+            document.getElementById('temperatureValue').textContent = settings.temperature;
+            document.getElementById('maxTokens').value = settings.maxTokens;
+            document.getElementById('systemPrompt').value = settings.systemPrompt;
+            document.getElementById('autoSave').checked = settings.autoSave;
+            document.getElementById('showTyping').checked = settings.showTyping;
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        function saveSettings() {
+            settings.model = document.getElementById('modelSelect').value;
+            settings.temperature = parseFloat(document.getElementById('temperatureSlider').value);
+            settings.maxTokens = parseInt(document.getElementById('maxTokens').value);
+            settings.systemPrompt = document.getElementById('systemPrompt').value;
+            settings.autoSave = document.getElementById('autoSave').checked;
+            settings.showTyping = document.getElementById('showTyping').checked;
+            
+            localStorage.setItem('aiProSettings', JSON.stringify(settings));
+            closeSettings();
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('aiProSettings');
+            if (saved) {
+                settings = { ...settings, ...JSON.parse(saved) };
+                document.body.setAttribute('data-theme', settings.theme);
+            }
+        }
+
+        function saveConversations() {
+            localStorage.setItem('aiProConversations', JSON.stringify(conversationHistory));
+        }
+
+        function loadConversations() {
+            const saved = localStorage.getItem('aiProConversations');
+            if (saved) {
+                conversationHistory = JSON.parse(saved);
+                
+                // Restore chat if there are saved conversations
+                if (conversationHistory.length > 0) {
+                    document.getElementById('chatContainer').innerHTML = '';
+                    
+                    for (let i = 0; i < conversationHistory.length; i += 2) {
+                        if (conversationHistory[i] && conversationHistory[i].role === 'user') {
+                            addMessage('user', conversationHistory[i].content);
+                        }
+                        if (conversationHistory[i + 1] && conversationHistory[i + 1].role === 'assistant') {
+                            addMessage('assistant', conversationHistory[i + 1].content);
+                        }
+                    }
+                }
+            }
+        }
+
+        function copyMessage(btn) {
+            const messageContent = btn.closest('.message-content');
+            const text = messageContent.textContent.replace(/📋 Copy🔄 Regenerate.*$/, '').trim();
+            
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = '✅ Copied';
+                setTimeout(() => {
+                    btn.innerHTML = '📋 Copy';
+                }, 2000);
+            });
+        }
+
+        function regenerateResponse(btn) {
+            // Find the user message before this assistant message
+            const messageDiv = btn.closest('.message');
+            const messages = Array.from(document.querySelectorAll('.message'));
+            const currentIndex = messages.indexOf(messageDiv);
+            
+            if (currentIndex > 0) {
+                const userMessage = messages[currentIndex - 1];
+                const userContent = userMessage.querySelector('.message-content').textContent.replace(/\d{1,2}:\d{2}:\d{2} [AP]M/, '').trim();
+                
+                // Remove the last assistant response from history
+                if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === 'assistant') {
+                    conversationHistory.pop();
+                }
+                
+                // Remove the assistant message from UI
+                messageDiv.remove();
+                
+                // Regenerate response
+                showTypingIndicator();
+                callGroqAPI().then(response => {
+                    addMessage('assistant', response);
+                    conversationHistory.push({
+                        role: 'assistant',
+                        content: response
+                    });
+                    if (settings.autoSave) {
+                        saveConversations();
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    addMessage('assistant', '❌ Sorry, I encountered an error while regenerating the response.', true);
+                }).finally(() => {
+                    hideTypingIndicator();
+                });
+            }
+        }
+
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+            
+            for (const file of files) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    const prompt = `I've uploaded a file "${file.name}". Here's the content:\n\n${content}\n\nPlease analyze this file and provide insights.`;
+                    
+                    document.getElementById('messageInput').value = prompt;
+                    autoResizeTextarea.call(document.getElementById('messageInput'));
+                };
+                reader.readAsText(file);
+            }
+            
+            // Clear the file input
+            event.target.value = '';
+        }
+
+        function toggleVoiceInput() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                
+                recognition.onstart = function() {
+                    document.querySelector('[onclick="toggleVoiceInput()"]').style.background = 'var(--error-color)';
+                };
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('messageInput').value = transcript;
+                    autoResizeTextarea.call(document.getElementById('messageInput'));
+                };
+                
+                recognition.onend = function() {
+                    document.querySelector('[onclick="toggleVoiceInput()"]').style.background = '';
+                };
+                
+                recognition.start();
+            } else {
+                alert('Speech recognition is not supported in your browser.');
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('settingsModal');
+            if (event.target === modal) {
+                closeSettings();
+            }
+        };
+    </script>
+</body>
+</html>
+
